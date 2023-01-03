@@ -12,7 +12,11 @@ import UserList from "./components/UserList";
 import MessageContainer from "./components/MessageContainer";
 import InputMessage from "./components/InputMessage";
 
-const socket = io(process.env.REACT_APP_API);
+const socket = io(
+  process.env.REACT_APP_API_RENDER
+    ? process.env.REACT_APP_API_RENDER
+    : process.env.REACT_APP_API
+);
 
 function App() {
   //const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
