@@ -1,7 +1,8 @@
 import "./App.css";
 import logo from "./logo.svg";
 import React, { useState, useEffect } from "react";
-import * as dayjs from "dayjs";
+import * as dayjs from "dayjs/locale/es";
+import locale from "dayjs";
 import { io } from "socket.io-client";
 import ModalForm from "./components/ModalForm";
 import Container from "react-bootstrap/Container";
@@ -11,7 +12,7 @@ import UserList from "./components/UserList";
 import MessageContainer from "./components/MessageContainer";
 import InputMessage from "./components/InputMessage";
 
-const socket = io("http://localhost:3001");
+const socket = io(process.env.WEBSOCKET_API);
 
 function App() {
   //const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
