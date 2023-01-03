@@ -3,7 +3,7 @@ import logo from "./logo.svg";
 import React, { useState, useEffect } from "react";
 import * as dayjs from "dayjs";
 // eslint-disable-next-line no-unused-vars
-import locale from "dayjs/locale/es";
+import "dayjs/locale/es";
 import { io } from "socket.io-client";
 import ModalForm from "./components/ModalForm";
 import Container from "react-bootstrap/Container";
