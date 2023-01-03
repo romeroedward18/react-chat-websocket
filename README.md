@@ -29,7 +29,7 @@ Desplegar la aplicación con npm usando siguiente comando en las carpetas client
   cd react-chat-websocket/client
   npm start
 
-  cd react-chat-websocket/client
+  cd react-chat-websocket/server
   npm start
 ```
 
