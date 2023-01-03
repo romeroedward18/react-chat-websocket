@@ -2,7 +2,6 @@ import "./App.css";
 import logo from "./logo.svg";
 import React, { useState, useEffect } from "react";
 import * as dayjs from "dayjs";
-// eslint-disable-next-line no-unused-vars
 import "dayjs/locale/es";
 import { io } from "socket.io-client";
 import ModalForm from "./components/ModalForm";
@@ -13,7 +12,7 @@ import UserList from "./components/UserList";
 import MessageContainer from "./components/MessageContainer";
 import InputMessage from "./components/InputMessage";
 
-const socket = io(process.env.WEBSOCKET_API);
+const socket = io(process.env.REACT_APP_API);
 
 function App() {
   //const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
