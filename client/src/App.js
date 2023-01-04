@@ -57,7 +57,7 @@ function App() {
 
   useEffect(() => {
     socket.on("receive-subscribe", (userList) => {
-      const userListFilter = userList.reduce((acc, user) => {
+      const userListFilter = Object.values(userList).reduce((acc, user) => {
         if (user.id !== socket.id) {
           acc.push(user);
         }
@@ -139,12 +139,10 @@ function App() {
                 />
               </Col>
               <Col className="chat-box msg" xs lg="8">
-                <div className="messages-container">
-                  <MessageContainer
-                    userData={userData}
-                    currentChat={currentChat}
-                  />
-                </div>
+                <MessageContainer
+                  userData={userData}
+                  currentChat={currentChat}
+                />
                 {currentChat ? (
                   <InputMessage sendMessage={sendMessage} />
                 ) : null}

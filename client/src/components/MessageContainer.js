@@ -1,11 +1,21 @@
-import React, { Suspense } from "react";
+import React, { useRef, useEffect, Suspense } from "react";
 import "../App.css";
 import * as dayjs from "dayjs";
 
 export default function MessageContainer({ userData, currentChat }) {
+  const messagesEndRef = useRef(null);
+
+  function scrollToBottom() {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [currentChat.messages]);
+
   let arrMessages = [];
   return (
-    <>
+    <div className="messages-container">
       {currentChat
         ? currentChat.messages.map((msg, key, arr) => {
             const type = msg.userId === userData.id ? "send" : "receive";
@@ -42,6 +52,7 @@ export default function MessageContainer({ userData, currentChat }) {
             );
           })
         : null}
-    </>
+      <div ref={messagesEndRef} />
+    </div>
   );
 }
