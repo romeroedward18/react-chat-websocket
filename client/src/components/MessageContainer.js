@@ -4,6 +4,8 @@ import * as dayjs from "dayjs";
 
 export default function MessageContainer({ userData, currentChat }) {
   const messagesEndRef = useRef(null);
+  const currentChaMessages = currentChat ? currentChat.messages : null;
+  let arrMessages = [];
 
   function scrollToBottom() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -11,9 +13,8 @@ export default function MessageContainer({ userData, currentChat }) {
 
   useEffect(() => {
     scrollToBottom();
-  }, [currentChat.messages]);
+  }, [currentChaMessages]);
 
-  let arrMessages = [];
   return (
     <div className="messages-container">
       {currentChat
