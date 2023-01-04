@@ -26,11 +26,25 @@ function App() {
     {
       id: 1,
       name: "Usuario Prueba",
+      avatar: logo,
       messages: [
         {
           userId: 1,
           name: "Usuario Prueba",
           message: "Hola esto es una prueba",
+          dateTime: currentDateTime,
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: "Usuario sadasdas",
+      avatar: logo,
+      messages: [
+        {
+          userId: 2,
+          name: "Usuario sadasdas",
+          message: "aaaaaaaaaaaaaaaaaa",
           dateTime: currentDateTime,
         },
       ],
@@ -43,16 +57,13 @@ function App() {
 
   useEffect(() => {
     socket.on("receive-subscribe", (userList) => {
-      const userListFilter = userList.filter((user) => user.id !== socket.id);
-      userListFilter.forEach((user) => {
-        setChat((chats) => {
-          const chatsId = chats.map((chat) => chat.id);
-          if (!chatsId.includes(user.id)) {
-            return [...chats, user];
-          }
-          return chats;
-        });
-      });
+      const userListFilter = userList.reduce((acc, user) => {
+        if (user.id !== socket.id) {
+          acc.push(user);
+        }
+        return acc;
+      }, []);
+      setChat((chats) => [...chats, ...userListFilter]);
     });
 
     socket.on("receive-message", (msgObj) => {
@@ -73,7 +84,7 @@ function App() {
   }, []);
 
   function joinChat(user) {
-    const thisUserData = { id: socket.id, ...user };
+    const thisUserData = { id: socket.id, avatar: logo, ...user };
     setUserData(thisUserData);
     socket.emit("send-subscribe", thisUserData);
     setModalShow(false);
@@ -91,25 +102,23 @@ function App() {
       dateTime: currentDateTime,
     };
     socket.emit("send-message", msgObj, activeChat);
-    setChat((chats) =>
-      chats.map((chat) => {
-        if (chat.id === activeChat) {
-          return { ...chat, messages: [...chat.messages, msgObj] };
-        }
-        return chat;
-      })
-    );
+    const updatedChat = chats.find((chat) => chat.id === activeChat);
+    updatedChat.messages = [...updatedChat.messages, msgObj];
+    setChat((chats) => [...chats]);
   }
 
-  chats.sort(function (a, b) {
-    return a.messages.length > 0 && b.messages.length > 0
-      ? new Date(b.messages.at(-1).dateTime) -
-          new Date(a.messages.at(-1).dateTime)
-      : null;
-  });
+  function sortChatsByLastMessage(chats) {
+    return chats.sort((a, b) => {
+      const aLastMessage =
+        a.messages.length > 0 ? a.messages[a.messages.length - 1] : null;
+      const bLastMessage =
+        b.messages.length > 0 ? b.messages[b.messages.length - 1] : null;
+      if (!aLastMessage || !bLastMessage) return null;
+      return new Date(bLastMessage.dateTime) - new Date(aLastMessage.dateTime);
+    });
+  }
 
   const currentChat = chats.find((chat) => chat.id === activeChat);
-  let arrMessages = [];
 
   return (
     <div className="App">
@@ -123,57 +132,18 @@ function App() {
           <Container className="chat-container">
             <Row>
               <Col className="chat-box user" xs>
-                {chats.map((chat, key) => {
-                  return (
-                    <UserList
-                      key={key}
-                      onClick={() => joinChannel(chat.id)}
-                      avatar={logo}
-                      name={chat.name}
-                      dateTime={
-                        chat.messages.length > 0
-                          ? dayjs(chat.messages.at(-1).dateTime).format(
-                              "DD/MM/YYYY h:mm A"
-                            )
-                          : ""
-                      }
-                      active={chat.id === activeChat}
-                    />
-                  );
-                })}
+                <UserList
+                  currentChat={currentChat}
+                  chats={sortChatsByLastMessage(chats)}
+                  joinChannel={joinChannel}
+                />
               </Col>
               <Col className="chat-box msg" xs lg="8">
                 <div className="messages-container">
-                  {currentChat
-                    ? currentChat.messages.map((msg, key, arr) => {
-                        const type =
-                          msg.userId === userData.id ? "send" : "receive";
-                        const dateTime =
-                          arrMessages.length > 0 &&
-                          dayjs(arrMessages.at(-1).dateTime).format(
-                            "MMMM D, YYYY h:mm A"
-                          ) ===
-                            dayjs(msg.dateTimedayjs).format(
-                              "MMMM D, YYYY h:mm A"
-                            )
-                            ? ""
-                            : dayjs(msg.dateTime).format("MMMM D, YYYY h:mm A");
-                        if (arr.length - 1 === key) {
-                          arrMessages = [];
-                        } else {
-                          arrMessages.push(msg);
-                        }
-                        return (
-                          <MessageContainer
-                            key={key}
-                            type={type}
-                            dateTime={dateTime}
-                            avatar={logo}
-                            message={msg.message}
-                          />
-                        );
-                      })
-                    : null}
+                  <MessageContainer
+                    userData={userData}
+                    currentChat={currentChat}
+                  />
                 </div>
                 {currentChat ? (
                   <InputMessage sendMessage={sendMessage} />
