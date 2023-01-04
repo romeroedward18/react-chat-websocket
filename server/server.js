@@ -15,6 +15,9 @@ io.on("connection", (socket) => {
     if (room) {
       socket.to(room).emit("receive-message", msgObj);
     }
+    if (msgObj.message === "command: disconnect-users") {
+      socket.emit("disconnect-users");
+    }
   });
 
   socket.on("send-subscribe", (userData) => {
@@ -28,6 +31,10 @@ io.on("connection", (socket) => {
   socket.on("receive-subscribe", (userData) => {
     socket.join(userList.map((user) => user.id));
     console.log(userList);
+  });
+
+  socket.on("disconnect-users", () => {
+    userList = {};
   });
 
   socket.on("disconnect", () => {

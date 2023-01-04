@@ -77,9 +77,15 @@ function App() {
       );
     });
 
+    socket.on("disconnect-users", () => {
+      setChat([]);
+      window.location.reload();
+    });
+
     return () => {
       socket.off("receive-subscribe");
       socket.off("receive-message");
+      socket.off("disconnect-users");
     };
   }, []);
 
@@ -119,6 +125,8 @@ function App() {
   }
 
   const currentChat = chats.find((chat) => chat.id === activeChat);
+
+  console.log(chats)
 
   return (
     <div className="App">
