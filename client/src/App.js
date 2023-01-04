@@ -36,19 +36,6 @@ function App() {
         },
       ],
     },
-    {
-      id: 2,
-      name: "Usuario sadasdas",
-      avatar: logo,
-      messages: [
-        {
-          userId: 2,
-          name: "Usuario sadasdas",
-          message: "aaaaaaaaaaaaaaaaaa",
-          dateTime: currentDateTime,
-        },
-      ],
-    },
   ];
   const [modalShow, setModalShow] = useState(true);
   const [userData, setUserData] = useState({});
@@ -64,12 +51,17 @@ function App() {
         return acc;
       }, []);
       setChat((chats) => {
-        const updatedChats = [...chats];
+        let updatedChats = [...chats];
         userListFilter.forEach((user) => {
           if (!updatedChats.find((chat) => chat.id === user.id)) {
             updatedChats.push(user);
           }
         });
+        updatedChats = updatedChats.filter((chat) => userList[chat.id]);
+        const chat1 = chats.find((chat) => chat.id === 1);
+        if (chat1 && !updatedChats.find((chat) => chat.id === 1)) {
+          updatedChats.push(chat1);
+        }
         return updatedChats;
       });
     });

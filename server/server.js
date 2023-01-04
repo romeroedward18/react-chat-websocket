@@ -28,7 +28,7 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("receive-subscribe", userList);
   });
 
-  socket.on("receive-subscribe", (userData) => {
+  socket.on("receive-subscribe", () => {
     socket.join(userList.map((user) => user.id));
     console.log(userList);
   });
@@ -40,5 +40,6 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log(`disconnect: ${socket.id}`)
     delete userList[socket.id];
+    socket.broadcast.emit("receive-subscribe", userList);
   });
 });
