@@ -63,7 +63,15 @@ function App() {
         }
         return acc;
       }, []);
-      setChat((chats) => [...chats, ...userListFilter]);
+      setChat((chats) => {
+        const updatedChats = [...chats];
+        userListFilter.forEach((user) => {
+          if (!updatedChats.find((chat) => chat.id === user.id)) {
+            updatedChats.push(user);
+          }
+        });
+        return updatedChats;
+      });
     });
 
     socket.on("receive-message", (msgObj) => {
@@ -126,7 +134,7 @@ function App() {
 
   const currentChat = chats.find((chat) => chat.id === activeChat);
 
-  console.log(chats)
+  console.log(chats);
 
   return (
     <div className="App">
