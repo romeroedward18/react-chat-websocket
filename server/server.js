@@ -1,15 +1,11 @@
 const { on } = require("nodemon");
+const cors = require("./corsConfig");
 
 const io = require("socket.io")(3001, {
-  cors: {
-    origin: [
-      "http://localhost:3000",
-      "https://react-chat-websocket.onrender.com",
-    ],
-  },
+  cors,
 });
 
-let userList = [];
+let userList = {};
 
 io.on("connection", (socket) => {
   console.log("connection: " + socket.id);
@@ -22,7 +18,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send-subscribe", (userData) => {
-    userList.push({ ...userData, messages: [] });
+    userList[userData.id] = { ...userData, messages: [] };
     console.log("send-subscribe");
     console.log(userList);
     socket.emit("receive-subscribe", userList);
@@ -31,5 +27,10 @@ io.on("connection", (socket) => {
 
   socket.on("receive-subscribe", (userData) => {
     socket.join(userList.map((user) => user.id));
+    console.log(userList);
+  });
+
+  socket.on("disconnect", () => {
+    delete userList[socket.id];
   });
 });
