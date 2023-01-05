@@ -1,6 +1,7 @@
 import "./App.css";
 import logo from "./logo.svg";
-import React, { useState, useEffect } from "react";
+import NotificationSound from "./notification-sound.mp3";
+import React, { useRef, useState, useEffect } from "react";
 import * as dayjs from "dayjs";
 import "dayjs/locale/es";
 import { io } from "socket.io-client";
@@ -27,6 +28,7 @@ function App() {
       id: 1,
       name: "Usuario Prueba",
       avatar: logo,
+      status: "unseen",
       messages: [
         {
           userId: 1,
@@ -37,10 +39,15 @@ function App() {
       ],
     },
   ];
+  const audioPlayer = useRef(null);
   const [modalShow, setModalShow] = useState(true);
   const [userData, setUserData] = useState({});
   const [activeChat, setActiveChat] = useState(null);
   const [chats, setChat] = useState(initialState);
+
+  function playAudio() {
+    audioPlayer.current.play();
+  }
 
   useEffect(() => {
     socket.on("receive-subscribe", (userList) => {
@@ -69,6 +76,10 @@ function App() {
     socket.on("receive-message", (msgObj) => {
       setChat((chats) =>
         chats.map((chat) => {
+          if (chat.id !== activeChat) {
+            chat.status = "unseen";
+            playAudio();
+          }
           if (chat.id === msgObj.userId) {
             return { ...chat, messages: [...chat.messages, msgObj] };
           }
@@ -87,7 +98,7 @@ function App() {
       socket.off("receive-message");
       socket.off("disconnect-users");
     };
-  }, []);
+  }, [activeChat]);
 
   function joinChat(user) {
     const thisUserData = { id: socket.id, avatar: logo, ...user };
@@ -98,6 +109,14 @@ function App() {
 
   function joinChannel(chatId) {
     setActiveChat(chatId);
+    setChat((chats) =>
+      chats.map((chat) => {
+        if (chat.id === chatId) {
+          return { ...chat, status: "seen" };
+        }
+        return chat;
+      })
+    );
   }
 
   function sendMessage(message) {
@@ -144,18 +163,21 @@ function App() {
                   currentChat={currentChat}
                   chats={sortChatsByLastMessage(chats)}
                   joinChannel={joinChannel}
+                  userData={userData}
                 />
               </Col>
               <Col className="chat-box msg" xs lg="8">
                 <MessageContainer
                   userData={userData}
                   currentChat={currentChat}
+                  chats={chats}
                 />
                 {currentChat ? (
                   <InputMessage sendMessage={sendMessage} />
                 ) : null}
               </Col>
             </Row>
+            <audio ref={audioPlayer} src={NotificationSound} />
           </Container>
         ) : null}
       </header>

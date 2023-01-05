@@ -1,8 +1,8 @@
-import React, { useRef, useEffect, Suspense } from "react";
+import React, { memo, useRef, useEffect } from "react";
 import "../App.css";
 import * as dayjs from "dayjs";
 
-export default function MessageContainer({ userData, currentChat }) {
+const MessageContainer = memo(({ userData, currentChat, chats }) => {
   const messagesEndRef = useRef(null);
   const currentChaMessages = currentChat ? currentChat.messages : null;
   let arrMessages = [];
@@ -24,7 +24,7 @@ export default function MessageContainer({ userData, currentChat }) {
               arrMessages.length > 0 &&
               dayjs(arrMessages.at(-1).dateTime).format(
                 "MMMM D, YYYY h:mm A"
-              ) === dayjs(msg.dateTimedayjs).format("MMMM D, YYYY h:mm A")
+              ) === dayjs(msg.dateTime).format("MMMM D, YYYY h:mm A")
                 ? ""
                 : dayjs(msg.dateTime).format("MMMM D, YYYY h:mm A");
             if (arr.length - 1 === key) {
@@ -33,7 +33,7 @@ export default function MessageContainer({ userData, currentChat }) {
               arrMessages.push(msg);
             }
             return (
-              <Suspense key={key}>
+              <React.Fragment key={key}>
                 <p className="dataTime-text">{dateTime}</p>
                 <div className={`message-container ${type}`}>
                   {type === "receive" ? (
@@ -49,11 +49,13 @@ export default function MessageContainer({ userData, currentChat }) {
                     <div>{msg.message}</div>
                   </div>
                 </div>
-              </Suspense>
+              </React.Fragment>
             );
           })
         : null}
       <div ref={messagesEndRef} />
     </div>
   );
-}
+});
+
+export default MessageContainer;

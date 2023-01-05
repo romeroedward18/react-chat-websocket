@@ -1,37 +1,44 @@
-import React, { Suspense } from "react";
+import React, { memo } from "react";
 import "../App.css";
 import * as dayjs from "dayjs";
 
-export default function UserList({ joinChannel, currentChat, chats }) {
+const UserList = memo(({ onSetActiveChat, currentChat, chats, userData }) => {
   const currentChatId = currentChat ? currentChat.id : "";
+  console.log(chats)
   return (
     <>
       {chats.map((chat, key) => {
+        let lastMessage = "";
+        let lastMessageDateTime = "";
+        for (const msg of chat.messages) {
+          lastMessage =
+            msg.userId === userData.id ? `Tú: ${msg.message}` : msg.message;
+          lastMessageDateTime = dayjs(lastMessage.dateTime).format("h:mm A");
+        }
         return (
-          <Suspense key={key}>
+          <React.Fragment key={key}>
             <div
               className={`chat-user-container ${
                 chat.id === currentChatId ? "active" : ""
-              }`}
-              onClick={() => joinChannel(chat.id)}
+              } ${chat.status}`}
+              onClick={() => onSetActiveChat(chat.id)}
             >
               <div>
                 <img src={chat.avatar} alt="Avatar" className="user-avatar" />
               </div>
               <div className="user-info">
                 <div>{chat.name}</div>
-                <div>
-                  {chat.messages.length > 0
-                    ? dayjs(chat.messages.at(-1).dateTime).format(
-                        "DD/MM/YYYY h:mm A"
-                      )
-                    : ""}
-                </div>
+                <div className="last-msg">{lastMessage}</div>
+              </div>
+              <div className="user-msg-info">
+                <div>{lastMessageDateTime}</div>
               </div>
             </div>
-          </Suspense>
+          </React.Fragment>
         );
       })}
     </>
   );
-}
+});
+
+export default UserList;
