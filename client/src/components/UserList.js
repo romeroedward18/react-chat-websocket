@@ -2,9 +2,8 @@ import React, { memo } from "react";
 import "../App.css";
 import * as dayjs from "dayjs";
 
-const UserList = memo(({ onSetActiveChat, currentChat, chats, userData }) => {
+const UserList = memo(({ joinChannel, currentChat, chats, userData }) => {
   const currentChatId = currentChat ? currentChat.id : "";
-  console.log(chats)
   return (
     <>
       {chats.map((chat, key) => {
@@ -21,7 +20,7 @@ const UserList = memo(({ onSetActiveChat, currentChat, chats, userData }) => {
               className={`chat-user-container ${
                 chat.id === currentChatId ? "active" : ""
               } ${chat.status}`}
-              onClick={() => onSetActiveChat(chat.id)}
+              onClick={() => joinChannel(chat.id)}
             >
               <div>
                 <img src={chat.avatar} alt="Avatar" className="user-avatar" />
