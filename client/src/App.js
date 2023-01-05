@@ -13,6 +13,7 @@ import UserList from "./components/UserList";
 import MessageContainer from "./components/MessageContainer";
 import InputMessage from "./components/InputMessage";
 
+// Establecer la conexión con Socket.io
 const socket = io(
   window.location.toString().includes("localhost")
     ? process.env.REACT_APP_API
@@ -21,8 +22,10 @@ const socket = io(
 
 function App() {
   //const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // Obtenemos la fecha y hora actual
   dayjs.locale("es");
   const currentDateTime = dayjs().format();
+  // Se establece el estado inicial de la aplicación con un solo usuario y un mensaje
   const initialState = [
     {
       id: 1,
@@ -39,32 +42,40 @@ function App() {
       ],
     },
   ];
+  // Se inicializa una referencia de audio y los estados de la aplicación
   const audioPlayer = useRef(null);
   const [modalShow, setModalShow] = useState(true);
   const [userData, setUserData] = useState({});
   const [activeChat, setActiveChat] = useState(null);
   const [chats, setChat] = useState(initialState);
 
+  // Función para reproducir el archivo de audio
   function playAudio() {
     audioPlayer.current.play();
   }
 
   useEffect(() => {
+    // Cuando se recibe un mensaje de "receive-subscribe", actualiza la lista de usuarios
     socket.on("receive-subscribe", (userList) => {
+      // Filtramos la lista de usuarios para excluir al usuario actual
       const userListFilter = Object.values(userList).reduce((acc, user) => {
         if (user.id !== socket.id) {
           acc.push(user);
         }
         return acc;
       }, []);
+      // Actualizamos el estado de la aplicación con la lista de usuarios filtrada
       setChat((chats) => {
         let updatedChats = [...chats];
+        // Añadimos cada usuario a la lista de chats si no está ya en ella
         userListFilter.forEach((user) => {
           if (!updatedChats.find((chat) => chat.id === user.id)) {
             updatedChats.push(user);
           }
         });
+        // Filtramos la lista de chats para excluir a cualquier usuario que ya no esté en la lista de usuarios
         updatedChats = updatedChats.filter((chat) => userList[chat.id]);
+        // Mantenemos el usuario de pruebas en la lista de chats
         const chat1 = chats.find((chat) => chat.id === 1);
         if (chat1 && !updatedChats.find((chat) => chat.id === 1)) {
           updatedChats.push(chat1);
@@ -73,6 +84,7 @@ function App() {
       });
     });
 
+    // Cuando se recibe un mensaje de "receive-message", se actualiza el chat activo y reproducimos un sonido de notificación
     socket.on("receive-message", (msgObj) => {
       setChat((chats) =>
         chats.map((chat) => {
@@ -80,6 +92,7 @@ function App() {
             chat.status = "unseen";
             playAudio();
           }
+          // Si el id del chat coincide con el id del usuario que envió el mensaje, actualizamos el objeto con el nuevo mensaje
           if (chat.id === msgObj.userId) {
             return { ...chat, messages: [...chat.messages, msgObj] };
           }
@@ -88,21 +101,19 @@ function App() {
       );
     });
 
-    socket.on("disconnect-users", () => {
-      setChat([]);
-      window.location.reload();
-    });
-
+    // Desconectamos los handlers cuando se desmonta el componente
     return () => {
       socket.off("receive-subscribe");
       socket.off("receive-message");
-      socket.off("disconnect-users");
     };
   }, [activeChat]);
 
+  // Esta función se llama cuando se envía el formulario de inicio de sesión y se utiliza para unirse al chat
   function joinChat(user) {
+    // Creamos un objeto con los datos del usuario actual
     const thisUserData = { id: socket.id, avatar: logo, ...user };
     setUserData(thisUserData);
+    // Establece el estado de la aplicación con los datos del usuario actual y envía un mensaje al servidor para subscribirse al chat
     socket.emit("send-subscribe", thisUserData);
     setModalShow(false);
   }
@@ -119,19 +130,23 @@ function App() {
     );
   }
 
+  // Esta función se llama cuando se envía un mensaje y se utiliza para enviar un mensaje al servidor y actualiza el estado de la aplicación
   function sendMessage(message) {
+    // Creamos un objeto con los datos del mensaje
     const msgObj = {
       userId: userData.id,
       name: userData.name,
       message: message,
       dateTime: currentDateTime,
     };
+    // Envía el mensaje al servidor y actualiza el chat activo con el mensaje enviado
     socket.emit("send-message", msgObj, activeChat);
     const updatedChat = chats.find((chat) => chat.id === activeChat);
     updatedChat.messages = [...updatedChat.messages, msgObj];
     setChat((chats) => [...chats]);
   }
 
+  // Esta función nos permite ordenar los chats por la fecha y hora del último mensaje
   function sortChatsByLastMessage(chats) {
     return chats.sort((a, b) => {
       const aLastMessage =
