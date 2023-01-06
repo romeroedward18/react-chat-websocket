@@ -1,7 +1,7 @@
 
 # react-chat-websocket
 
-Proyecto de chat uno a uno múltiples usuarios con React.js y Socket.IO
+Proyecto aplicación de chat uno a uno en tiempo real utilizando React.js y Socket.IO.
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
@@ -33,12 +33,14 @@ Desplegar la aplicación con npm usando siguiente comando en las carpetas client
   npm start
 ```
 
+La aplicación se iniciará en el puerto 3000 de tu máquina. Abre tu navegador en http://localhost:3000.
 
-## Tech Stack
 
-**Client:** React, TailwindCSS, React Bootstrap
+## Características técnicas
 
-**Server:** Node, Express, Socket.IO
+**Cliente:** React, TailwindCSS, React Bootstrap
+
+**Servidor:** Node, Express, Socket.IO
 
 
 ## Recursos
