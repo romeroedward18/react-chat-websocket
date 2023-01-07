@@ -14,11 +14,7 @@ import MessageContainer from "./components/MessageContainer";
 import InputMessage from "./components/InputMessage";
 
 // Establecer la conexión con Socket.io
-const socket = io(
-  window.location.toString().includes("localhost")
-    ? process.env.REACT_APP_API
-    : process.env.REACT_APP_RENDER_API
-);
+const socket = io(process.env.REACT_APP_API);
 
 function App() {
   //const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
