@@ -24,10 +24,12 @@ function ModalForm({ joinChat, ...props }) {
     <Modal
       {...props}
       size="lg"
+      backdrop="static"
+      keyboard={false}
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title id="contained-modal-title-vcenter">
           Ingresa tus datos
         </Modal.Title>
