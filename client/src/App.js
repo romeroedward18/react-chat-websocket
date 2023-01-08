@@ -105,8 +105,6 @@ function App() {
     // Desconectamos los handlers cuando se desmonta el componente
     return () => {
       socket.off("connect");
-      socket.off("receive-subscribe");
-      socket.off("receive-message");
     };
   }, [activeChat]);
 
