@@ -6,6 +6,7 @@ import * as dayjs from "dayjs";
 import "dayjs/locale/es";
 import { io } from "socket.io-client";
 import ModalForm from "./components/ModalForm";
+import Alert from "react-bootstrap/Alert";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -15,6 +16,7 @@ import InputMessage from "./components/InputMessage";
 
 // Establecer la conexión con Socket.io
 const socket = io(process.env.REACT_APP_API);
+console.log(socket);
 
 function App() {
   //const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -156,41 +158,49 @@ function App() {
 
   const currentChat = chats.find((chat) => chat.id === activeChat);
 
-  console.log(chats);
-
   return (
     <div className="App">
       <header className="App-header">
-        <ModalForm
-          show={modalShow}
-          onHide={() => setModalShow(false)}
-          joinChat={joinChat}
-        />
-        {!modalShow ? (
-          <Container className="chat-container">
-            <Row>
-              <Col className="chat-box user" xs>
-                <UserList
-                  currentChat={currentChat}
-                  chats={sortChatsByLastMessage(chats)}
-                  joinChannel={joinChannel}
-                  userData={userData}
-                />
-              </Col>
-              <Col className="chat-box msg" xs lg="8">
-                <MessageContainer
-                  userData={userData}
-                  currentChat={currentChat}
-                  chats={chats}
-                />
-                {currentChat ? (
-                  <InputMessage sendMessage={sendMessage} />
-                ) : null}
-              </Col>
-            </Row>
-            <audio ref={audioPlayer} src={NotificationSound} />
-          </Container>
-        ) : null}
+        {!socket ? (
+          <Alert>
+            Parece que hay un problema con la conexión del servidor, recarga la
+            página o consulta con el desarrollador. Disculpe las molestias
+            ocasionadas :)
+          </Alert>
+        ) : (
+          <>
+            <ModalForm
+              show={modalShow}
+              onHide={() => setModalShow(false)}
+              joinChat={joinChat}
+            />
+            {!modalShow ? (
+              <Container className="chat-container">
+                <Row>
+                  <Col className="chat-box user" xs>
+                    <UserList
+                      currentChat={currentChat}
+                      chats={sortChatsByLastMessage(chats)}
+                      joinChannel={joinChannel}
+                      userData={userData}
+                    />
+                  </Col>
+                  <Col className="chat-box msg" xs lg="8">
+                    <MessageContainer
+                      userData={userData}
+                      currentChat={currentChat}
+                      chats={chats}
+                    />
+                    {currentChat ? (
+                      <InputMessage sendMessage={sendMessage} />
+                    ) : null}
+                  </Col>
+                </Row>
+                <audio ref={audioPlayer} src={NotificationSound} />
+              </Container>
+            ) : null}
+          </>
+        )}
       </header>
     </div>
   );
