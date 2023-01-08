@@ -16,7 +16,6 @@ import InputMessage from "./components/InputMessage";
 
 // Establecer la conexión con Socket.io
 const socket = io(process.env.REACT_APP_API);
-console.log(socket);
 
 function App() {
   //const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
